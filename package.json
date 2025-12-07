@@ -1,0 +1,30 @@
+{
+  "name": "vm-autostart-lambda",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && npm run bundle && npm run copy-deps",
+    "bundle": "esbuild src/handlers/autoStartHandler.ts --bundle --platform=node --target=node18 --outfile=dist/handlers/autoStartHandler.js --external:@aws-sdk/* --external:cron-parser --external:luxon",
+    "copy-deps": "mkdir -p dist/node_modules && cp -r node_modules/cron-parser dist/node_modules/ && cp -r node_modules/luxon dist/node_modules/",
+    "deploy": "npm run build && sam deploy --guided",
+    "local": "sam local invoke AutoStartFunction --event events/test-event.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.946.0",
+    "@aws-sdk/client-s3": "^3.946.0",
+    "@aws-sdk/client-ses": "^3.946.0",
+    "@types/aws-lambda": "^8.10.159",
+    "cron-parser": "^5.4.0",
+    "luxon": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "esbuild": "^0.27.1",
+    "typescript": "^5.9.3"
+  }
+}

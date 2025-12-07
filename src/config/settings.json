@@ -1,0 +1,26 @@
+{
+  "autoStartSchedules": [
+    {
+      "provider": "aws",
+      "instanceId": "i-034f14354f7546cab",
+      "region": "us-east-1",
+      "cron": "0 9 * * MON-FRI",
+      "enabled": true,
+      "timezone": "America/New_York",
+      "name": "Production Web Server",
+      "tags": {
+        "environment": "production",
+        "team": "backend"
+      }
+    },
+    {
+      "provider": "aws",
+      "instanceId": "i-abcdef0123456789",
+      "region": "us-west-2",
+      "cron": "0 8 * * MON-FRI",
+      "enabled": true,
+      "timezone": "America/Los_Angeles",
+      "name": "Dev Database Server"
+    }
+  ]
+}

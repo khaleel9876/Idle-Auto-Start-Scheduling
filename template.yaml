@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EC2 Auto-Start Lambda Function
+
+Parameters:
+  ConfigBucket:
+    Type: String
+    Description: S3 bucket containing configuration
+  FromEmail:
+    Type: String
+    Description: SES verified sender email
+  ToEmail:
+    Type: String
+    Description: Email recipient for notifications
+
+Globals:
+  Function:
+    Timeout: 300
+    Runtime: nodejs18.x
+    MemorySize: 256
+
+Resources:
+  AutoStartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: handlers/autoStartHandler.handler
+      Environment:
+        Variables:
+          CONFIG_BUCKET: !Ref ConfigBucket
+          CONFIG_KEY: config/settings.json
+          FROM_EMAIL: !Ref FromEmail
+          TO_EMAIL: !Ref ToEmail
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ec2:StartInstances
+                - ec2:DescribeInstances
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub 'arn:aws:s3:::${ConfigBucket}/*'
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource: '*'
+      Events:
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(5 minutes)'
+            Description: Run auto-start check every 5 minutes
+            Enabled: true
+
+Outputs:
+  AutoStartFunctionArn:
+    Description: Auto-Start Lambda Function ARN
+    Value: !GetAtt AutoStartFunction.Arn
